@@ -35,12 +35,6 @@ public:
     virtual void SetMode(tN2kMsg &N2kMsg, PilotModes mode) = 0;
     virtual void SendKeyCommand(uint16_t command) = 0;
     virtual void SendSetMode(PilotModes mode) = 0;
-
-    // Pure virtual callback helpers - brand-specific implementations
-    virtual std::function<void()> on() = 0;
-    virtual std::function<void()> standby() = 0;
-    virtual std::function<void()> plus10() = 0;
-    virtual std::function<void()> minus10() = 0;
 };
 
 #endif // AUTOPILOT_INTERFACE_H

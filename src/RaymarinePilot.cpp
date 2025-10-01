@@ -94,24 +94,3 @@ void RaymarinePilot::SendSetMode(PilotModes mode)
     SetMode(N2kMsg, mode);
     nmea2000.SendMsg(N2kMsg);
 }
-
-// Callback helper implementations
-std::function<void()> RaymarinePilot::on()
-{
-    return [this]() { SendSetMode(MODE_AUTO); };
-}
-
-std::function<void()> RaymarinePilot::standby()
-{
-    return [this]() { SendSetMode(MODE_STANDBY); };
-}
-
-std::function<void()> RaymarinePilot::plus10()
-{
-    return [this]() { SendKeyCommand(PLUS_10); };
-}
-
-std::function<void()> RaymarinePilot::minus10()
-{
-    return [this]() { SendKeyCommand(MINUS_10); };
-}

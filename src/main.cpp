@@ -17,6 +17,9 @@ Button off(12);      // Pin 12 - Standby Mode
 Button minusTen(14); // Pin 14 - Starboard 10°
 Button plusTen(26);  // Pin 26 - Port 10°
 
+// Global pilot instance (will be initialized in setup())
+AutopilotInterface *pilot = nullptr;
+
 /**
  * @brief Setup NMEA2000 with Raymarine device information
  * This function configures the NMEA2000 interface with the necessary
@@ -67,18 +70,32 @@ void setup()
     Serial.println("❌ NMEA2000 failed to initialize");
   }
 
-  AutopilotInterface *pilot = new RaymarinePilot(NMEA2000);
-  // If you want to create new implementations for other autopilot brands, you can copy the RaymarinePilot class and modify it accordingly.
-  // Then, you can instantiate your new class here.
-  // AutopilotInterface *pilot = new GarminPilot(NMEA2000);
-  // AutopilotInterface *pilot = new SimradPilot(NMEA2000);
-  // AutopilotInterface *pilot = new B&G(NMEA2000);
+  pilot = new RaymarinePilot(NMEA2000);
+  // Setup buttons with handlers
+  on.setup(onHandler);
+  off.setup(offHandler);
+  plusTen.setup(plusTenHandler);
+  minusTen.setup(minusTenHandler);
+}
 
-  // Setup buttons with callbacks
-  on.setup(pilot->on());
-  off.setup(pilot->standby());
-  plusTen.setup(pilot->plus10());
-  minusTen.setup(pilot->minus10());
+void offHandler()
+{
+  pilot->SendSetMode(AutopilotInterface::MODE_STANDBY);
+}
+
+void onHandler()
+{
+  pilot->SendSetMode(AutopilotInterface::MODE_AUTO);
+}
+
+void plusTenHandler()
+{
+  pilot->SendKeyCommand(RaymarinePilot::PLUS_10);
+}
+
+void minusTenHandler()
+{
+  pilot->SendKeyCommand(RaymarinePilot::MINUS_10);
 }
 
 void loop()

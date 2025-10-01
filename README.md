@@ -17,10 +17,10 @@ It currently only works with Raymarine autopilots that support the NMEA2000 prot
 
 - MCP2515 CAN Bus Module - [Amazon affiliate Link](https://amzn.to/4nZz4yW)
 
-- Jumper wires
+- Jumper wires [Amazon affiliate Link](https://amzn.to/4pUqzHe)
 - DC Cable [Amazon affiliate Link](https://amzn.to/4nsR4Sa)
 - NMEA2000 Cable (Cut the female port off) - [Amazon affiliate Link](https://amzn.to/46G0wfn)
-- Buttons - [Amazon affiliate Link](https://amzn.to/46G0wfn)
+- Buttons - [Amazon affiliate Link](https://amzn.to/3IAz6OH)
 
 ### 3D Printed Case
 I designed the case using blender and printed it with BambuLab PLA Matte. You can find the STL files in the `case` directory of this repository.

@@ -1,4 +1,6 @@
 ### Intro
+<img width="1920" height="1080" alt="billede" src="https://github.com/user-attachments/assets/769d572b-4528-464a-9b68-38c7eee1a444" />
+
 I wanted an extra way to control my boat's Raymarine autopilot, so I built a simple remote control using an ESP32, MCP2515 CAN Bus module, and some buttons. The remote sends commands to the autopilot over the NMEA2000 network.
 
 The remotes capabilities are basic, but it gets the job done. It has buttons for AUTO, STANDBY, +10 degrees, and -10 degrees. The remote connects to the NMEA2000 network using a MCP2515 CAN Bus module.

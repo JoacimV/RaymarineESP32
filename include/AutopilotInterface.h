@@ -24,6 +24,11 @@ public:
         MODE_STANDBY = 0,
         MODE_AUTO = 1
     };
+    enum TurnDirections
+    {
+        TURN_PORT = 0,
+        TURN_STARBOARD = 1
+    };
 
     // Constructor - takes NMEA2000 reference
     AutopilotInterface(tNMEA2000 &nmea2000Instance) : nmea2000(nmea2000Instance) {}
@@ -32,9 +37,8 @@ public:
     virtual ~AutopilotInterface() = default;
 
     // Pure virtual methods - must be implemented by each brand
-    virtual void SetMode(tN2kMsg &N2kMsg, PilotModes mode) = 0;
-    virtual void SendKeyCommand(uint16_t command) = 0;
     virtual void SendSetMode(PilotModes mode) = 0;
+    virtual void SendTurn(TurnDirections direction) = 0;
 };
 
 #endif // AUTOPILOT_INTERFACE_H

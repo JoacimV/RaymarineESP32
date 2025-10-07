@@ -17,16 +17,13 @@ public:
 private:
     static int PilotSourceAddress; // Raymarine-specific source address
 
-    // Private helper method for key commands
-    void KeyCommand(tN2kMsg &N2kMsg, uint16_t command);
 
 public:
     // Constructor - takes NMEA2000 reference
     RaymarinePilot(tNMEA2000 &nmea2000Instance);
 
     // Implement pure virtual methods from AutopilotInterface
-    void SetMode(tN2kMsg &N2kMsg, PilotModes mode) override;
-    void SendKeyCommand(uint16_t command) override;
+    void SendTurn(TurnDirections direction) override;
     void SendSetMode(PilotModes mode) override;
 };
 

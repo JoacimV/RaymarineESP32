@@ -3,7 +3,7 @@
 #include "AutopilotInterface.h"
 #include "RaymarinePilot.h"
 #include "MessageHandler.h"
-
+#include "OnHandler.h"
 // NMEA2000 Libraries
 #define N2k_SPI_CS_PIN 5
 #include <NMEA2000_mcp.h>
@@ -70,32 +70,14 @@ void setup()
     Serial.println("❌ NMEA2000 failed to initialize");
   }
 
-  pilot = new RaymarinePilot(NMEA2000);
   // Setup buttons with handlers
-  on.setup(onHandler);
-  off.setup(offHandler);
-  plusTen.setup(plusTenHandler);
-  minusTen.setup(minusTenHandler);
+  on.setup(onHandle);
 }
 
-void offHandler()
+void onHandle()
 {
-  pilot->SendSetMode(AutopilotInterface::MODE_STANDBY);
-}
-
-void onHandler()
-{
-  pilot->SendSetMode(AutopilotInterface::MODE_AUTO);
-}
-
-void plusTenHandler()
-{
-  pilot->SendKeyCommand(RaymarinePilot::PLUS_10);
-}
-
-void minusTenHandler()
-{
-  pilot->SendKeyCommand(RaymarinePilot::MINUS_10);
+  OnHandler onhandler(NMEA2000);
+  onhandler.execute();
 }
 
 void loop()

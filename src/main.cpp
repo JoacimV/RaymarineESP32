@@ -80,22 +80,22 @@ void setup()
 
 void offHandler()
 {
-  pilot->SendSetMode(AutopilotInterface::MODE_STANDBY);
+  pilot->setMode(AutopilotInterface::MODE_STANDBY);
 }
 
 void onHandler()
 {
-  pilot->SendSetMode(AutopilotInterface::MODE_AUTO);
+  pilot->setMode(AutopilotInterface::MODE_AUTO);
 }
 
 void plusTenHandler()
 {
-  pilot->SendKeyCommand(RaymarinePilot::PLUS_10);
+  pilot->turn(AutopilotInterface::TURN_RIGHT_TEN);
 }
 
 void minusTenHandler()
 {
-  pilot->SendKeyCommand(RaymarinePilot::MINUS_10);
+  pilot->turn(AutopilotInterface::TURN_LEFT_TEN);
 }
 
 void loop()

@@ -2,6 +2,10 @@
 #define RAYMARINE_PILOT_H
 
 #include "AutopilotInterface.h"
+#include <N2kMessages.h>
+
+// Forward declaration
+class tNMEA2000;
 
 /**
  * Raymarine-specific autopilot implementation
@@ -13,21 +17,19 @@ public:
     // Raymarine-specific key command constants
     static const uint16_t PLUS_10 = 0x08F7;  // Starboard 10°
     static const uint16_t MINUS_10 = 0x06F9; // Port 10°
+    static const uint16_t PILOT_SOURCE_ADDRESS = 204;
 
 private:
     static int PilotSourceAddress; // Raymarine-specific source address
-
-    // Private helper method for key commands
-    void KeyCommand(tN2kMsg &N2kMsg, uint16_t command);
+    tNMEA2000 &nmea2000;           // Reference to NMEA2000 instance
 
 public:
     // Constructor - takes NMEA2000 reference
     RaymarinePilot(tNMEA2000 &nmea2000Instance);
 
     // Implement pure virtual methods from AutopilotInterface
-    void SetMode(tN2kMsg &N2kMsg, PilotModes mode) override;
-    void SendKeyCommand(uint16_t command) override;
-    void SendSetMode(PilotModes mode) override;
+    virtual void setMode(PilotModes mode) override;
+    virtual void turn(TurnCommands command) override;
 };
 
 #endif // RAYMARINE_PILOT_H

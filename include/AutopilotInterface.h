@@ -1,12 +1,7 @@
 #ifndef AUTOPILOT_INTERFACE_H
 #define AUTOPILOT_INTERFACE_H
 
-#include <Arduino.h>
 #include <functional>
-#include <N2kMessages.h>
-
-// Forward declarations
-class tNMEA2000;
 
 /**
  * Abstract base class for autopilot implementations
@@ -14,9 +9,6 @@ class tNMEA2000;
  */
 class AutopilotInterface
 {
-protected:
-    tNMEA2000 &nmea2000; // Reference to NMEA2000 instance
-
 public:
     // Common autopilot modes (all brands support these)
     enum PilotModes
@@ -25,16 +17,23 @@ public:
         MODE_AUTO = 1
     };
 
+    enum TurnCommands
+    {
+        TURN_LEFT = 0,
+        TURN_RIGHT = 1,
+        TURN_LEFT_TEN = 2,
+        TURN_RIGHT_TEN = 3
+    };
+
     // Constructor - takes NMEA2000 reference
-    AutopilotInterface(tNMEA2000 &nmea2000Instance) : nmea2000(nmea2000Instance) {}
+    AutopilotInterface() {}
 
     // Virtual destructor (important for proper cleanup)
     virtual ~AutopilotInterface() = default;
 
     // Pure virtual methods - must be implemented by each brand
-    virtual void SetMode(tN2kMsg &N2kMsg, PilotModes mode) = 0;
-    virtual void SendKeyCommand(uint16_t command) = 0;
-    virtual void SendSetMode(PilotModes mode) = 0;
+    virtual void setMode(PilotModes mode) = 0;
+    virtual void turn(TurnCommands command) = 0;
 };
 
 #endif // AUTOPILOT_INTERFACE_H

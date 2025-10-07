@@ -25,7 +25,7 @@ public:
         TURN_RIGHT_TEN = 3
     };
 
-    // Constructor - takes NMEA2000 reference
+    // Constructor
     AutopilotInterface() {}
 
     // Virtual destructor (important for proper cleanup)
@@ -34,6 +34,11 @@ public:
     // Pure virtual methods - must be implemented by each brand
     virtual void setMode(PilotModes mode) = 0;
     virtual void turn(TurnCommands command) = 0;
+    /**
+     * Will be called from the main loop to allow the autopilot to perform
+     * any periodic tasks, such as sending heartbeat messages.
+     */
+    virtual void update() = 0;
 };
 
 #endif // AUTOPILOT_INTERFACE_H

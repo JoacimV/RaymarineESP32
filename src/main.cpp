@@ -2,14 +2,6 @@
 #include "Button.h"
 #include "AutopilotInterface.h"
 #include "RaymarinePilot.h"
-#include "MessageHandler.h"
-
-// NMEA2000 Libraries
-#define N2k_SPI_CS_PIN 5
-#include <NMEA2000_mcp.h>
-#include <N2kMessages.h>
-
-tNMEA2000_mcp NMEA2000(N2k_SPI_CS_PIN, MCP_8MHz);
 
 // Create button instances
 Button on(13);       // Pin 13 - Auto Mode
@@ -20,49 +12,35 @@ Button plusTen(26);  // Pin 26 - Port 10°
 // Global pilot instance (will be initialized in setup())
 AutopilotInterface *pilot = nullptr;
 
-/**
- * @brief Setup NMEA2000 with Raymarine device information
- * This function configures the NMEA2000 interface with the necessary
- * device information for a Raymarine EV-100 autopilot remote control.
- * @return true if initialization was successful.
- */
-bool setupNMEA2000()
+// Handler functions
+void offHandler(AutopilotInterface *pilot)
 {
-  // Configure NMEA2000 buffers
-  NMEA2000.SetN2kCANReceiveFrameBufSize(150);
-  NMEA2000.SetN2kCANMsgBufSize(10);
-  NMEA2000.SetMsgHandler(MessageHandler::HandleNMEA2000Msg);
-
-  // Set device information
-  NMEA2000.SetProductInformation(
-      "00000001",                // Manufacturer's Model serial code
-      100,                       // Manufacturer's product code
-      "Raymarine EV-100 Remote", // Manufacturer's Model ID
-      "1.0.0.0",                 // Manufacturer's Software version code
-      "1.0.0.0"                  // Manufacturer's Model version
-  );
-
-  NMEA2000.SetDeviceInformation(
-      1,   // Unique number (21 bit)
-      140, // Device function (Steering and Control)
-      120, // Device class (Display)
-      1851 // Manufacturer code (Raymarine)
-  );
-
-  NMEA2000.SetInstallationDescription1("Raymarine EV-100");
-  NMEA2000.SetInstallationDescription2("ESP32 Remote Control");
-  NMEA2000.SetMode(tNMEA2000::N2km_NodeOnly);
-
-  // Open NMEA2000 interface and return the result
-  return NMEA2000.Open();
+  pilot->setMode(AutopilotInterface::MODE_STANDBY);
 }
 
+void onHandler(AutopilotInterface *pilot)
+{
+  pilot->setMode(AutopilotInterface::MODE_AUTO);
+}
+
+void plusTenHandler(AutopilotInterface *pilot)
+{
+  pilot->turn(AutopilotInterface::TURN_RIGHT_TEN);
+}
+
+void minusTenHandler(AutopilotInterface *pilot)
+{
+  pilot->turn(AutopilotInterface::TURN_LEFT_TEN);
+}
+
+// Setup function - now AFTER handler definitions
 void setup()
 {
   Serial.begin(115200);
-  if (setupNMEA2000())
+
+  // Initialize NMEA2000 for Raymarine communication
+  if (RaymarinePilot::initializeNMEA2000())
   {
-    // TODO: Could turn on a LED indicator here on successful initialization
     Serial.println("✅ Raymarine ESP32 Remote Ready!");
   }
   else
@@ -70,36 +48,20 @@ void setup()
     Serial.println("❌ NMEA2000 failed to initialize");
   }
 
-  pilot = new RaymarinePilot(NMEA2000);
+  pilot = new RaymarinePilot();
   // Setup buttons with handlers
-  on.setup(onHandler);
-  off.setup(offHandler);
-  plusTen.setup(plusTenHandler);
-  minusTen.setup(minusTenHandler);
-}
-
-void offHandler()
-{
-  pilot->setMode(AutopilotInterface::MODE_STANDBY);
-}
-
-void onHandler()
-{
-  pilot->setMode(AutopilotInterface::MODE_AUTO);
-}
-
-void plusTenHandler()
-{
-  pilot->turn(AutopilotInterface::TURN_RIGHT_TEN);
-}
-
-void minusTenHandler()
-{
-  pilot->turn(AutopilotInterface::TURN_LEFT_TEN);
+  on.setup([&]()
+           { onHandler(pilot); });
+  off.setup([&]()
+            { offHandler(pilot); });
+  plusTen.setup([&]()
+                { plusTenHandler(pilot); });
+  minusTen.setup([&]()
+                 { minusTenHandler(pilot); });
 }
 
 void loop()
 {
-  NMEA2000.ParseMessages();
-  delay(50);
+  pilot->update();
+  delay(40);
 }

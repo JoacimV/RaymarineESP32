@@ -1,7 +1,43 @@
 #include "RaymarinePilot.h"
+#include "MessageHandler.h"
 #include <NMEA2000_mcp.h>
 
-RaymarinePilot::RaymarinePilot(tNMEA2000 &nmea2000Instance) : AutopilotInterface(), nmea2000(nmea2000Instance) {}
+#define N2k_SPI_CS_PIN 5
+
+tNMEA2000_mcp NMEA2000(N2k_SPI_CS_PIN, MCP_8MHz);
+
+RaymarinePilot::RaymarinePilot() : AutopilotInterface() {}
+
+bool RaymarinePilot::initializeNMEA2000()
+{
+    // Configure NMEA2000 buffers for Raymarine communication
+    NMEA2000.SetN2kCANReceiveFrameBufSize(150);
+    NMEA2000.SetN2kCANMsgBufSize(10);
+    NMEA2000.SetMsgHandler(MessageHandler::HandleNMEA2000Msg);
+
+    // Set Raymarine EV-100 Remote device information
+    NMEA2000.SetProductInformation(
+        "00000001",                // Manufacturer's Model serial code
+        100,                       // Manufacturer's product code
+        "Raymarine EV-100 Remote", // Manufacturer's Model ID
+        "1.0.0.0",                 // Manufacturer's Software version code
+        "1.0.0.0"                  // Manufacturer's Model version
+    );
+
+    NMEA2000.SetDeviceInformation(
+        1,   // Unique number (21 bit)
+        140, // Device function (Steering and Control)
+        120, // Device class (Display)
+        1851 // Manufacturer code (Raymarine)
+    );
+
+    NMEA2000.SetInstallationDescription1("Raymarine EV-100");
+    NMEA2000.SetInstallationDescription2("ESP32 Remote Control");
+    NMEA2000.SetMode(tNMEA2000::N2km_NodeOnly);
+
+    // Open NMEA2000 interface and return the result
+    return NMEA2000.Open();
+}
 
 void RaymarinePilot::setMode(PilotModes mode)
 {
@@ -37,7 +73,7 @@ void RaymarinePilot::setMode(PilotModes mode)
     N2kMsg.AddByte(0x05);
     N2kMsg.AddByte(0xff);
     N2kMsg.AddByte(0xff);
-    nmea2000.SendMsg(N2kMsg);
+    NMEA2000.SendMsg(N2kMsg);
 }
 
 void RaymarinePilot::turn(TurnCommands command)
@@ -87,5 +123,10 @@ void RaymarinePilot::turn(TurnCommands command)
     N2kMsg.AddByte(0x42);
     N2kMsg.AddByte(0xb1);
     N2kMsg.AddByte(0xc8);
-    nmea2000.SendMsg(N2kMsg);
+    NMEA2000.SendMsg(N2kMsg);
+}
+
+void RaymarinePilot::update()
+{
+    NMEA2000.ParseMessages();
 }

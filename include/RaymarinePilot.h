@@ -2,10 +2,12 @@
 #define RAYMARINE_PILOT_H
 
 #include "AutopilotInterface.h"
-#include <N2kMessages.h>
 
 // Forward declaration
-class tNMEA2000;
+class tNMEA2000_mcp;
+
+// External NMEA2000 instance (defined in RaymarinePilot.cpp)
+extern tNMEA2000_mcp NMEA2000;
 
 /**
  * Raymarine-specific autopilot implementation
@@ -21,15 +23,18 @@ public:
 
 private:
     static int PilotSourceAddress; // Raymarine-specific source address
-    tNMEA2000 &nmea2000;           // Reference to NMEA2000 instance
 
 public:
-    // Constructor - takes NMEA2000 reference
-    RaymarinePilot(tNMEA2000 &nmea2000Instance);
+    // Constructor
+    RaymarinePilot();
+
+    // Static method to initialize NMEA2000 for Raymarine EV-100 use
+    static bool initializeNMEA2000();
 
     // Implement pure virtual methods from AutopilotInterface
     virtual void setMode(PilotModes mode) override;
     virtual void turn(TurnCommands command) override;
+    virtual void update() override;
 };
 
 #endif // RAYMARINE_PILOT_H

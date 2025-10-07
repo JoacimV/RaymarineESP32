@@ -13,22 +13,22 @@ Button plusTen(26);  // Pin 26 - Port 10°
 AutopilotInterface *pilot = nullptr;
 
 // Handler functions
-void offHandler(AutopilotInterface *pilot)
+void offHandler()
 {
   pilot->setMode(AutopilotInterface::MODE_STANDBY);
 }
 
-void onHandler(AutopilotInterface *pilot)
+void onHandler()
 {
   pilot->setMode(AutopilotInterface::MODE_AUTO);
 }
 
-void plusTenHandler(AutopilotInterface *pilot)
+void plusTenHandler()
 {
   pilot->turn(AutopilotInterface::TURN_RIGHT_TEN);
 }
 
-void minusTenHandler(AutopilotInterface *pilot)
+void minusTenHandler()
 {
   pilot->turn(AutopilotInterface::TURN_LEFT_TEN);
 }
@@ -50,14 +50,10 @@ void setup()
 
   pilot = new RaymarinePilot();
   // Setup buttons with handlers
-  on.setup([&]()
-           { onHandler(pilot); });
-  off.setup([&]()
-            { offHandler(pilot); });
-  plusTen.setup([&]()
-                { plusTenHandler(pilot); });
-  minusTen.setup([&]()
-                 { minusTenHandler(pilot); });
+  on.setup(onHandler);
+  off.setup(offHandler);
+  plusTen.setup(plusTenHandler);
+  minusTen.setup(minusTenHandler);
 }
 
 void loop()

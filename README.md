@@ -21,6 +21,8 @@ It currently only works with Raymarine autopilots that support the NMEA2000 prot
 - DC Cable [Amazon affiliate Link](https://amzn.to/4nsR4Sa)
 - NMEA2000 Cable (Cut the female port off) - [Amazon affiliate Link](https://amzn.to/46G0wfn)
 - Buttons - [Amazon affiliate Link](https://amzn.to/3IAz6OH)
+- Diode WS2812B [Amazon affiliate Link](https://amzn.to/4hwteD4)
+- Active Piezo Buzzer [Amazon affiliate Link](https://amzn.to/42XU9lj)
 
 ### 3D Printed Case
 I designed the case using blender and printed it with BambuLab PLA Matte. You can find the STL files in the `case` directory of this repository.
@@ -49,10 +51,38 @@ Wiring for buttons:
 | +10     | GPIO14    | Button Input |
 | -10     | GPIO26    | Button Input |
 
+Wiring for buzzer:
+
+| Buzzer Pin | ESP32 Pin | Description  |
+| ---------- | --------- | ------------ |
+| +          | GPIO4     | Buzzer Input |
+| GND        | GND       | Ground       |
+
+
 ### Software
 This project is built using [PlatformIO](https://platformio.org/).
 
 The raymarine pilot commands are greatly inspired by [this project](https://github.com/matztam/raymarine-evo-pilot-remote).
+
+### Running the Code
+
+## On ESP32
+1. Install PlatformIO IDE in Visual Studio Code.
+2. Clone this repository to your local machine.
+3. Open the project in Visual Studio Code.
+4. Connect your ESP32 to your computer via USB.
+5. Select the correct board and port in PlatformIO.
+6. Click the "Upload" button in PlatformIO to compile and upload the code to your ESP32.
+
+## On your PC
+1. Install PlatformIO IDE in Visual Studio Code.
+2. Clone this repository to your local machine.
+3. Open the project in Visual Studio Code.
+4. Open PlatformIO and hit the Build button.
+   
+### Disclaimer
+This project is provided as-is without any warranties. Use it at your own risk. The author is not responsible for any damage or issues that may arise from using this project.
+
 
 ### Libraries
 - Timo Lappalainen NMEA2000 library and MCP library: [GitHub Link](https://github.com/ttlappalainen)

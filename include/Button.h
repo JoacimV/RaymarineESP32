@@ -12,6 +12,7 @@ private:
     int pin;
     unsigned long lastInterruptTime;
     unsigned long debounceDelay;
+    volatile bool clickPending;
     LambdaCallback onClickLambdaCallback;
 
     // Static interrupt handler
@@ -26,6 +27,9 @@ public:
 
     // Combined setup: set callback and enable interrupt
     void setup(const LambdaCallback &callback);
+
+    // Run deferred click callbacks outside interrupt context.
+    void process();
 };
 
 #endif // BUTTON_H

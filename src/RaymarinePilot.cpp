@@ -1,18 +1,27 @@
 #include "RaymarinePilot.h"
 #include "MessageHandler.h"
 #include <NMEA2000_mcp.h>
+#include <ActisenseReader.h>
 
+tActisenseReader ActisenseReader;
 #define N2k_SPI_CS_PIN 5
 
+// Define READ_STREAM to port, where you write data from PC e.g. with NMEA Simulator.
+#define READ_STREAM Serial
+// Define ForwardStream to port, what you listen on PC side. On Arduino Due you can use e.g. SerialUSB
+#define FORWARD_STREAM Serial
+
 tNMEA2000_mcp NMEA2000(N2k_SPI_CS_PIN, MCP_8MHz);
+Stream *ReadStream = &READ_STREAM;
+Stream *ForwardStream = &FORWARD_STREAM;
 
 RaymarinePilot::RaymarinePilot() : AutopilotInterface() {}
 
 bool RaymarinePilot::initializeNMEA2000()
 {
     // Configure NMEA2000 buffers for Raymarine communication
-    NMEA2000.SetN2kCANReceiveFrameBufSize(150);
-    NMEA2000.SetN2kCANMsgBufSize(10);
+    NMEA2000.SetN2kCANReceiveFrameBufSize(200);
+    NMEA2000.SetN2kCANMsgBufSize(20);
     NMEA2000.SetMsgHandler(MessageHandler::HandleNMEA2000Msg);
 
     // Set Raymarine EV-100 Remote device information
@@ -33,9 +42,19 @@ bool RaymarinePilot::initializeNMEA2000()
 
     NMEA2000.SetInstallationDescription1("Raymarine EV-100");
     NMEA2000.SetInstallationDescription2("ESP32 Remote Control");
-    NMEA2000.SetMode(tNMEA2000::N2km_NodeOnly);
+    if (ReadStream != ForwardStream)
+        READ_STREAM.begin(115200);
+    FORWARD_STREAM.begin(115200);
+    NMEA2000.SetForwardStream(ForwardStream);
+    NMEA2000.SetMode(tNMEA2000::N2km_ListenAndNode);
 
+    ActisenseReader.SetReadStream(ReadStream);
+    ActisenseReader.SetDefaultSource(75);
+    ActisenseReader.SetMsgHandler([](const tN2kMsg &msg)
+                                  { NMEA2000.SendMsg(msg); });
     // Open NMEA2000 interface and return the result
+    if (ReadStream == ForwardStream)
+        NMEA2000.SetForwardOwnMessages(false); // If streams are same, do not echo own messages.
     return NMEA2000.Open();
 }
 
@@ -129,4 +148,5 @@ void RaymarinePilot::turn(TurnCommands command)
 void RaymarinePilot::update()
 {
     NMEA2000.ParseMessages();
+    ActisenseReader.ParseMessages();
 }

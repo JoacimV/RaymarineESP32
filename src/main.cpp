@@ -17,28 +17,47 @@ BuzzerInterface *buzzer = new PiezoActiveBuzzer(4);
 // Global pilot instance (will be initialized in setup())
 AutopilotInterface *pilot = nullptr;
 
+namespace
+{
+constexpr int StartupLedPin = 2;
+
+void blinkStartupLed(int blinkCount = 3, unsigned long onTimeMs = 120, unsigned long offTimeMs = 120)
+{
+  pinMode(StartupLedPin, OUTPUT);
+  digitalWrite(StartupLedPin, LOW);
+
+  for (int index = 0; index < blinkCount; ++index)
+  {
+    digitalWrite(StartupLedPin, HIGH);
+    delay(onTimeMs);
+    digitalWrite(StartupLedPin, LOW);
+    delay(offTimeMs);
+  }
+}
+}
+
 // Handler functions
 void offHandler()
 {
-  buzzer->beep();
+  // buzzer->beep();
   pilot->setMode(AutopilotInterface::MODE_STANDBY);
 }
 
 void onHandler()
 {
-  buzzer->beep();
+  // buzzer->beep();
   pilot->setMode(AutopilotInterface::MODE_AUTO);
 }
 
 void plusTenHandler()
 {
-  buzzer->beep();
+  // buzzer->beep();
   pilot->turn(AutopilotInterface::TURN_RIGHT_TEN);
 }
 
 void minusTenHandler()
 {
-  buzzer->beep();
+  // buzzer->beep();
   pilot->turn(AutopilotInterface::TURN_LEFT_TEN);
 }
 
@@ -46,6 +65,7 @@ void minusTenHandler()
 void setup()
 {
   Serial.begin(115200);
+  blinkStartupLed();
 
   // Initialize buzzer
   buzzer->begin();
@@ -70,7 +90,9 @@ void setup()
 
 void loop()
 {
+  on.process();
+  off.process();
+  plusTen.process();
+  minusTen.process();
   pilot->update();
-  // Small delay to save CPU cycles
-  delay(40);
 }

@@ -1,6 +1,11 @@
 #include "MessageHandler.h"
 #include <Arduino.h>
 
+namespace {
+unsigned char lastMode = 0xff;
+unsigned char lastSubmode = 0xff;
+}
+
 // Handle incoming NMEA2000 messages
 void MessageHandler::HandleNMEA2000Msg(const tN2kMsg &N2kMsg) {
     switch (N2kMsg.PGN) {
@@ -21,6 +26,13 @@ void MessageHandler::ParseAutopilotStatus(const tN2kMsg &N2kMsg) {
     int Index = 2;
     unsigned char Mode = N2kMsg.GetByte(Index);
     unsigned char Submode = N2kMsg.GetByte(Index);
+
+    if (Mode == lastMode && Submode == lastSubmode) {
+        return;
+    }
+
+    lastMode = Mode;
+    lastSubmode = Submode;
 
     Serial.print("🚢 PILOT: ");
     if (Mode == 0x00 && Submode == 0x00) {

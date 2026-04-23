@@ -1,15 +1,14 @@
 #include <Arduino.h>
-#include "Button.h"
 #include "AutopilotInterface.h"
 #include "RaymarinePilot.h"
 #include "BuzzerInterface.h"
 #include "PiezoActiveBuzzer.h"
-
+#include "Button2.h"
 // Create button instances
-Button on(13);       // Pin 13 - Auto Mode
-Button off(12);      // Pin 12 - Standby Mode
-Button minusTen(14); // Pin 14 - Starboard 10°
-Button plusTen(26);  // Pin 26 - Port 10°
+Button2 on(13);       // Pin 13 - Auto Mode
+Button2 off(12);      // Pin 12 - Standby Mode
+Button2 plusTen(14);  // Pin 14 - Starboard 10°
+Button2 minusTen(26); // Pin 26 - Port 10°
 
 // Buzzer instance (using interface for flexibility)
 BuzzerInterface *buzzer = new PiezoActiveBuzzer(4);
@@ -18,25 +17,25 @@ BuzzerInterface *buzzer = new PiezoActiveBuzzer(4);
 AutopilotInterface *pilot = nullptr;
 
 // Handler functions
-void offHandler()
+void offHandler(Button2 &btn)
 {
   buzzer->beep();
   pilot->setMode(AutopilotInterface::MODE_STANDBY);
 }
 
-void onHandler()
+void onHandler(Button2 &btn)
 {
   buzzer->beep();
   pilot->setMode(AutopilotInterface::MODE_AUTO);
 }
 
-void plusTenHandler()
+void plusTenHandler(Button2 &btn)
 {
   buzzer->beep();
   pilot->turn(AutopilotInterface::TURN_RIGHT_TEN);
 }
 
-void minusTenHandler()
+void minusTenHandler(Button2 &btn)
 {
   buzzer->beep();
   pilot->turn(AutopilotInterface::TURN_LEFT_TEN);
@@ -62,14 +61,18 @@ void setup()
 
   pilot = new RaymarinePilot();
   // Setup buttons with handlers
-  on.setup(onHandler);
-  off.setup(offHandler);
-  plusTen.setup(plusTenHandler);
-  minusTen.setup(minusTenHandler);
+  on.setTapHandler(onHandler);
+  off.setTapHandler(offHandler);
+  plusTen.setTapHandler(plusTenHandler);
+  minusTen.setTapHandler(minusTenHandler);
 }
 
 void loop()
 {
+  on.loop();
+  off.loop();
+  plusTen.loop();
+  minusTen.loop();
   pilot->update();
   // Small delay to save CPU cycles
   delay(40);

@@ -47,26 +47,41 @@ namespace
 
     LGFX lcd;
     constexpr int kBacklightPin = 22;
+    constexpr int kLabelX = 5;
+    constexpr int kLabelY = 40;
+    constexpr int kValueX = 5;
+    constexpr int kValueY = 140;
+    constexpr int kValueWidth = 160;
+    constexpr int kValueHeight = 48;
 } // namespace
 
 void LCDDisplay::begin()
 {
     lcd.init();
+    lcd.invertDisplay(true);
     lcd.setRotation(1);
 
     pinMode(kBacklightPin, OUTPUT);
     digitalWrite(kBacklightPin, HIGH);
 
+    lcd.fillScreen(TFT_BLACK);
     lcd.setTextColor(TFT_WHITE, TFT_BLACK);
-    lcd.setTextSize(4);
-    lcd.setTextDatum(middle_center);
+    lcd.setTextFont(4);
+    lcd.setTextSize(1);
 
-    randomSeed(analogRead(0));
+    lcd.drawString("hej", kLabelX, kLabelY);
 }
 
 void LCDDisplay::showValue(int value)
 {
-    lcd.fillScreen(TFT_BLACK);
-    lcd.drawString(String(value), 86, 160);
-    lcd.drawString("hej", 10, 12);
+    if (hasValue_ && value == lastValue_)
+    {
+        return;
+    }
+
+    lcd.fillRect(kValueX, kValueY, kValueWidth, kValueHeight, TFT_BLACK);
+    lcd.drawString(String(value), kValueX, kValueY);
+
+    lastValue_ = value;
+    hasValue_ = true;
 }

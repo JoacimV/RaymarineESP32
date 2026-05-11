@@ -1,6 +1,7 @@
 #ifndef RAYMARINE_PILOT_H
 #define RAYMARINE_PILOT_H
 
+#include <stdint.h>
 #include "AutopilotInterface.h"
 
 // Forward declaration

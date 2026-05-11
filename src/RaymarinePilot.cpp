@@ -6,7 +6,7 @@
 
 tNMEA2000_mcp NMEA2000(N2k_SPI_CS_PIN, MCP_8MHz);
 
-RaymarinePilot::RaymarinePilot() : AutopilotInterface() {}
+RaymarinePilot::RaymarinePilot() : AutopilotInterface(), ObservedState(STATE_UNKNOWN) {}
 
 bool RaymarinePilot::initializeNMEA2000()
 {
@@ -74,6 +74,16 @@ void RaymarinePilot::setMode(PilotModes mode)
     N2kMsg.AddByte(0xff);
     N2kMsg.AddByte(0xff);
     NMEA2000.SendMsg(N2kMsg);
+}
+
+void RaymarinePilot::setObservedState(PilotState state)
+{
+    ObservedState = state;
+}
+
+AutopilotInterface::PilotState RaymarinePilot::getState() const
+{
+    return ObservedState;
 }
 
 void RaymarinePilot::turn(TurnCommands command)

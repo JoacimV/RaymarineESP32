@@ -17,6 +17,14 @@ public:
         MODE_AUTO = 1
     };
 
+    // Current pilot state observed from the network.
+    enum PilotState
+    {
+        STATE_UNKNOWN = 0,
+        STATE_STANDBY,
+        STATE_AUTO
+    };
+
     enum TurnCommands
     {
         TURN_LEFT = 0,
@@ -33,6 +41,8 @@ public:
 
     // Pure virtual methods - must be implemented by each brand
     virtual void setMode(PilotModes mode) = 0;
+    virtual void setObservedState(PilotState state) = 0;
+    virtual PilotState getState() const = 0;
     virtual void turn(TurnCommands command) = 0;
     /**
      * Will be called from the main loop to allow the autopilot to perform

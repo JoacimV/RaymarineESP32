@@ -1,14 +1,14 @@
 #include <Arduino.h>
 #include "AutopilotInterface.h"
 #include "RaymarinePilot.h"
+#include "MessageHandler.h"
 #include "BuzzerInterface.h"
 #include "PiezoActiveBuzzer.h"
 #include "Button2.h"
 // Create button instances
-Button2 on(13);       // Pin 13 - Auto Mode
-Button2 off(12);      // Pin 12 - Standby Mode
-Button2 plusTen(14);  // Pin 14 - Starboard 10°
-Button2 minusTen(26); // Pin 26 - Port 10°
+Button2 on(0);       // Pin 13 - Auto Mode
+Button2 plusTen(1);  // Pin 14 - Starboard 10°
+Button2 minusTen(2); // Pin 26 - Port 10°
 
 // Buzzer instance (using interface for flexibility)
 BuzzerInterface *buzzer = new PiezoActiveBuzzer(4);
@@ -16,17 +16,29 @@ BuzzerInterface *buzzer = new PiezoActiveBuzzer(4);
 // Global pilot instance (will be initialized in setup())
 AutopilotInterface *pilot = nullptr;
 
-// Handler functions
-void offHandler(Button2 &btn)
+void pilotStateUpdateHandler(AutopilotInterface::PilotState state)
 {
-  buzzer->beep();
-  pilot->setMode(AutopilotInterface::MODE_STANDBY);
+  if (pilot != nullptr)
+  {
+    pilot->setObservedState(state);
+  }
 }
 
+// Handler functions
 void onHandler(Button2 &btn)
 {
   buzzer->beep();
-  pilot->setMode(AutopilotInterface::MODE_AUTO);
+  AutopilotInterface::PilotState state = pilot->getState();
+
+  // Toggle based on latest bus state; unknown defaults to AUTO.
+  if (state == AutopilotInterface::STATE_AUTO)
+  {
+    pilot->setMode(AutopilotInterface::MODE_STANDBY);
+  }
+  else
+  {
+    pilot->setMode(AutopilotInterface::MODE_AUTO);
+  }
 }
 
 void plusTenHandler(Button2 &btn)
@@ -60,9 +72,10 @@ void setup()
   }
 
   pilot = new RaymarinePilot();
+  MessageHandler::SetPilotStateUpdateCallback(pilotStateUpdateHandler);
+
   // Setup buttons with handlers
   on.setTapHandler(onHandler);
-  off.setTapHandler(offHandler);
   plusTen.setTapHandler(plusTenHandler);
   minusTen.setTapHandler(minusTenHandler);
 }
@@ -70,7 +83,6 @@ void setup()
 void loop()
 {
   on.loop();
-  off.loop();
   plusTen.loop();
   minusTen.loop();
   pilot->update();

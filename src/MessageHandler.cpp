@@ -1,6 +1,8 @@
 #include "MessageHandler.h"
 #include <Arduino.h>
 
+MessageHandler::PilotStateUpdateCallback MessageHandler::StateUpdateCallback = nullptr;
+
 // Handle incoming NMEA2000 messages
 void MessageHandler::HandleNMEA2000Msg(const tN2kMsg &N2kMsg) {
     switch (N2kMsg.PGN) {
@@ -16,6 +18,10 @@ void MessageHandler::HandleNMEA2000Msg(const tN2kMsg &N2kMsg) {
     }
 }
 
+void MessageHandler::SetPilotStateUpdateCallback(PilotStateUpdateCallback callback) {
+    StateUpdateCallback = callback;
+}
+
 // Parse autopilot status message (PGN 65379)
 void MessageHandler::ParseAutopilotStatus(const tN2kMsg &N2kMsg) {
     int Index = 2;
@@ -24,12 +30,21 @@ void MessageHandler::ParseAutopilotStatus(const tN2kMsg &N2kMsg) {
 
     Serial.print("🚢 PILOT: ");
     if (Mode == 0x00 && Submode == 0x00) {
+        if (StateUpdateCallback != nullptr) {
+            StateUpdateCallback(AutopilotInterface::STATE_STANDBY);
+        }
         Serial.println("STANDBY");
     }
     else if (Mode == 0x40 && Submode == 0x00) {
+        if (StateUpdateCallback != nullptr) {
+            StateUpdateCallback(AutopilotInterface::STATE_AUTO);
+        }
         Serial.println("AUTO");
     }
     else {
+        if (StateUpdateCallback != nullptr) {
+            StateUpdateCallback(AutopilotInterface::STATE_UNKNOWN);
+        }
         Serial.print("Mode=0x");
         Serial.print(Mode, HEX);
         Serial.print(" Sub=0x");

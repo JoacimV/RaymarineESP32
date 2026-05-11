@@ -24,6 +24,7 @@ public:
 
 private:
     static int PilotSourceAddress; // Raymarine-specific source address
+    volatile PilotState ObservedState;
 
 public:
     // Constructor
@@ -34,6 +35,8 @@ public:
 
     // Implement pure virtual methods from AutopilotInterface
     virtual void setMode(PilotModes mode) override;
+    virtual void setObservedState(PilotState state) override;
+    virtual PilotState getState() const override;
     virtual void turn(TurnCommands command) override;
     virtual void update() override;
 };

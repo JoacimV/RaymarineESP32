@@ -61,8 +61,9 @@ void setup()
   // Initialize buzzer
   buzzer->begin();
 
-  // Initialize NMEA2000 for Raymarine communication
-  if (RaymarinePilot::initializeNMEA2000())
+  pilot = new RaymarinePilot();
+
+  if (pilot->isReady())
   {
     Serial.println("✅ Raymarine ESP32 Remote Ready!");
   }
@@ -70,8 +71,6 @@ void setup()
   {
     Serial.println("❌ NMEA2000 failed to initialize");
   }
-
-  pilot = new RaymarinePilot();
   MessageHandler::SetPilotStateUpdateCallback(pilotStateUpdateHandler);
 
   // Setup buttons with handlers

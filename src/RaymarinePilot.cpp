@@ -6,9 +6,7 @@
 
 tNMEA2000_mcp NMEA2000(N2k_SPI_CS_PIN, MCP_8MHz);
 
-RaymarinePilot::RaymarinePilot() : AutopilotInterface(), ObservedState(STATE_UNKNOWN) {}
-
-bool RaymarinePilot::initializeNMEA2000()
+RaymarinePilot::RaymarinePilot() : AutopilotInterface(), ObservedState(STATE_UNKNOWN), Ready(false)
 {
     // Configure NMEA2000 buffers for Raymarine communication
     NMEA2000.SetN2kCANReceiveFrameBufSize(150);
@@ -35,8 +33,12 @@ bool RaymarinePilot::initializeNMEA2000()
     NMEA2000.SetInstallationDescription2("ESP32 Remote Control");
     NMEA2000.SetMode(tNMEA2000::N2km_NodeOnly);
 
-    // Open NMEA2000 interface and return the result
-    return NMEA2000.Open();
+    Ready = NMEA2000.Open();
+}
+
+bool RaymarinePilot::isReady() const
+{
+    return Ready;
 }
 
 void RaymarinePilot::setMode(PilotModes mode)

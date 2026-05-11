@@ -40,6 +40,7 @@ public:
     virtual ~AutopilotInterface() = default;
 
     // Pure virtual methods - must be implemented by each brand
+    virtual bool isReady() const = 0;
     virtual void setMode(PilotModes mode) = 0;
     virtual void setObservedState(PilotState state) = 0;
     virtual PilotState getState() const = 0;

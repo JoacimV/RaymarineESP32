@@ -4,14 +4,17 @@
 #include "MessageHandler.h"
 #include "BuzzerInterface.h"
 #include "PiezoActiveBuzzer.h"
+#include "LCDDisplay.h"
 #include "Button2.h"
+
+LCDDisplay lcd;
 // Create button instances
 Button2 on(0);       // Pin 13 - Auto Mode
 Button2 plusTen(1);  // Pin 14 - Starboard 10°
 Button2 minusTen(2); // Pin 26 - Port 10°
 
 // Buzzer instance (using interface for flexibility)
-BuzzerInterface *buzzer = new PiezoActiveBuzzer(4);
+BuzzerInterface *buzzer = new PiezoActiveBuzzer(3);
 
 // Global pilot instance (will be initialized in setup())
 AutopilotInterface *pilot = nullptr;
@@ -77,6 +80,7 @@ void setup()
   on.setTapHandler(onHandler);
   plusTen.setTapHandler(plusTenHandler);
   minusTen.setTapHandler(minusTenHandler);
+  lcd.begin();
 }
 
 void loop()
@@ -87,4 +91,6 @@ void loop()
   pilot->update();
   // Small delay to save CPU cycles
   delay(40);
+  int value = random(0, 361);
+  lcd.showValue(value);
 }

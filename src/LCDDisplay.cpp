@@ -35,7 +35,7 @@ namespace
             pcfg.memory_height = 320;
             pcfg.panel_width = 172;
             pcfg.panel_height = 320;
-            pcfg.offset_x = 0;
+            pcfg.offset_x = -34;
             pcfg.offset_y = 0;
 
             pcfg.offset_rotation = 0;
@@ -53,6 +53,10 @@ namespace
     constexpr int kValueY = 140;
     constexpr int kValueWidth = 160;
     constexpr int kValueHeight = 48;
+    constexpr int kBtnX = 5;
+    constexpr int kBtnY = 70;
+    constexpr int kBtnWidth = 160;
+    constexpr int kBtnHeight = 32;
 } // namespace
 
 void LCDDisplay::begin()
@@ -63,13 +67,13 @@ void LCDDisplay::begin()
 
     pinMode(kBacklightPin, OUTPUT);
     digitalWrite(kBacklightPin, HIGH);
-
     lcd.fillScreen(TFT_BLACK);
+    lcd.drawRect(0, 0, lcd.width(), lcd.height(), TFT_BLUE);
     lcd.setTextColor(TFT_WHITE, TFT_BLACK);
     lcd.setTextFont(4);
     lcd.setTextSize(1);
 
-    lcd.drawString("hej", kLabelX, kLabelY);
+    lcd.drawString("AUTOPILOT", kLabelX, kLabelY);
 }
 
 void LCDDisplay::showValue(int value)
@@ -81,7 +85,16 @@ void LCDDisplay::showValue(int value)
 
     lcd.fillRect(kValueX, kValueY, kValueWidth, kValueHeight, TFT_BLACK);
     lcd.drawString(String(value), kValueX, kValueY);
+    // rgbLedWrite(8, random(0, 256), random(0, 256), random(0, 256));
 
     lastValue_ = value;
     hasValue_ = true;
+}
+
+void LCDDisplay::showButton(const char* label)
+{
+    lcd.fillRect(kBtnX, kBtnY, kBtnWidth, kBtnHeight, TFT_BLACK);
+    lcd.setTextColor(TFT_YELLOW, TFT_BLACK);
+    lcd.drawString(label, kBtnX, kBtnY);
+    lcd.setTextColor(TFT_WHITE, TFT_BLACK);
 }

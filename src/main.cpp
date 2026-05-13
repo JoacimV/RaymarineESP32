@@ -31,6 +31,7 @@ void pilotStateUpdateHandler(AutopilotInterface::PilotState state)
 void onHandler(Button2 &btn)
 {
   buzzer->beep();
+  lcd.showButton("BTN: ON/STBY");
   AutopilotInterface::PilotState state = pilot->getState();
 
   // Toggle based on latest bus state; unknown defaults to AUTO.
@@ -47,12 +48,14 @@ void onHandler(Button2 &btn)
 void plusTenHandler(Button2 &btn)
 {
   buzzer->beep();
+  lcd.showButton("BTN: +10");
   pilot->turn(AutopilotInterface::TURN_RIGHT_TEN);
 }
 
 void minusTenHandler(Button2 &btn)
 {
   buzzer->beep();
+  lcd.showButton("BTN: -10");
   pilot->turn(AutopilotInterface::TURN_LEFT_TEN);
 }
 
@@ -91,6 +94,6 @@ void loop()
   pilot->update();
   // Small delay to save CPU cycles
   delay(40);
-  int value = random(0, 361);
-  lcd.showValue(value);
+  // int value = random(0, 361);
+  lcd.showValue(0);
 }

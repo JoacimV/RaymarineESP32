@@ -4,17 +4,15 @@
 #include "MessageHandler.h"
 #include "BuzzerInterface.h"
 #include "PiezoActiveBuzzer.h"
-#include "LCDDisplay.h"
 #include "Button2.h"
 
-LCDDisplay lcd;
 // Create button instances
-Button2 on(0);       // Pin 13 - Auto Mode
-Button2 plusTen(1);  // Pin 14 - Starboard 10°
-Button2 minusTen(2); // Pin 26 - Port 10°
+Button2 on(14);       // Pin 14 - Auto Mode
+Button2 plusTen(12);  // Pin 12 - Starboard 10°
+Button2 minusTen(13); // Pin 13 - Port 10°
 
 // Buzzer instance (using interface for flexibility)
-BuzzerInterface *buzzer = new PiezoActiveBuzzer(3);
+BuzzerInterface *buzzer = new PiezoActiveBuzzer(27);
 
 // Global pilot instance (will be initialized in setup())
 AutopilotInterface *pilot = nullptr;
@@ -31,7 +29,6 @@ void pilotStateUpdateHandler(AutopilotInterface::PilotState state)
 void onHandler(Button2 &btn)
 {
   buzzer->beep();
-  lcd.showButton("BTN: ON/STBY");
   AutopilotInterface::PilotState state = pilot->getState();
 
   // Toggle based on latest bus state; unknown defaults to AUTO.
@@ -48,14 +45,12 @@ void onHandler(Button2 &btn)
 void plusTenHandler(Button2 &btn)
 {
   buzzer->beep();
-  lcd.showButton("BTN: +10");
   pilot->turn(AutopilotInterface::TURN_RIGHT_TEN);
 }
 
 void minusTenHandler(Button2 &btn)
 {
   buzzer->beep();
-  lcd.showButton("BTN: -10");
   pilot->turn(AutopilotInterface::TURN_LEFT_TEN);
 }
 
@@ -63,12 +58,12 @@ void minusTenHandler(Button2 &btn)
 void setup()
 {
   Serial.begin(115200);
+  Serial.println("Starting Raymarine ESP32 Remote...");
 
   // Initialize buzzer
   buzzer->begin();
 
   pilot = new RaymarinePilot();
-
   if (pilot->isReady())
   {
     Serial.println("✅ Raymarine ESP32 Remote Ready!");
@@ -83,7 +78,6 @@ void setup()
   on.setTapHandler(onHandler);
   plusTen.setTapHandler(plusTenHandler);
   minusTen.setTapHandler(minusTenHandler);
-  lcd.begin();
 }
 
 void loop()
@@ -93,7 +87,5 @@ void loop()
   minusTen.loop();
   pilot->update();
   // Small delay to save CPU cycles
-  delay(40);
-  // int value = random(0, 361);
-  lcd.showValue(0);
+  // delay(40);
 }

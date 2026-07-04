@@ -24,16 +24,18 @@ public:
 
 private:
     static int PilotSourceAddress; // Raymarine-specific source address
+    volatile PilotState ObservedState;
+    bool Ready;
 
 public:
-    // Constructor
+    // Constructor — initializes and opens the NMEA2000 interface
     RaymarinePilot();
 
-    // Static method to initialize NMEA2000 for Raymarine EV-100 use
-    static bool initializeNMEA2000();
-
     // Implement pure virtual methods from AutopilotInterface
+    virtual bool isReady() const override;
     virtual void setMode(PilotModes mode) override;
+    virtual void setObservedState(PilotState state) override;
+    virtual PilotState getState() const override;
     virtual void turn(TurnCommands command) override;
     virtual void update() override;
 };
